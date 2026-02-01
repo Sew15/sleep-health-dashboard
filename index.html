@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleep Health Prediction - Sri Lanka</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --midnight: #0a0e27;
+            --deep-blue: #1a2642;
+            --ocean: #2d4263;
+            --lavender: #c8b8db;
+            --soft-pink: #ffd5cd;
+            --warm-cream: #fff8f0;
+            --sage: #a8c5b4;
+            --coral: #ff6b6b;
+            --golden: #f4a261;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+            background: linear-gradient(135deg, var(--midnight) 0%, var(--deep-blue) 50%, var(--ocean) 100%);
+            color: var(--warm-cream);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(200, 184, 219, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(168, 197, 180, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .app-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .header h1 {
+            font-family: 'Crimson Pro', serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--soft-pink), var(--lavender), var(--sage));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: var(--lavender);
+            font-weight: 400;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            animation: fadeInUp 0.8s ease-out 0.2s backwards;
+        }
+
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: rgba(26, 38, 66, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            border: 1px solid rgba(200, 184, 219, 0.2);
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 
+                0 25px 70px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .card-title {
+            font-family: 'Crimson Pro', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--soft-pink);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .icon {
+            width: 32px;
+            height: 32px;
+            display: inline-block;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--lavender);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.85rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(10, 14, 39, 0.6);
+            border: 2px solid rgba(200, 184, 219, 0.3);
+            border-radius: 12px;
+            color: var(--warm-cream);
+            font-size: 1rem;
+            font-family: 'Manrope', sans-serif;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input[type="number"]:focus,
+        select:focus {
+            border-color: var(--lavender);
+            background: rgba(10, 14, 39, 0.8);
+            box-shadow: 0 0 0 4px rgba(200, 184, 219, 0.1);
+        }
+
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23c8b8db' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 18px center;
+            padding-right: 45px;
+        }
+
+        .slider-group {
+            margin-bottom: 28px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .slider-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--golden);
+            background: rgba(244, 162, 97, 0.15);
+            padding: 4px 12px;
+            border-radius: 8px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            background: rgba(200, 184, 219, 0.2);
+            border-radius: 10px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--soft-pink), var(--lavender));
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(200, 184, 219, 0.4);
+            transition: transform 0.2s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--soft-pink), var(--lavender));
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 12px rgba(200, 184, 219, 0.4);
+        }
+
+        .predict-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--coral), var(--golden));
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+            font-family: 'Manrope', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(255, 107, 107, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 12px;
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(255, 107, 107, 0.4);
+        }
+
+        .predict-btn:active {
+            transform: translateY(0);
+        }
+
+        .predict-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-section {
+            margin-top: 32px;
+            padding-top: 32px;
+            border-top: 1px solid rgba(200, 184, 219, 0.2);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, rgba(168, 197, 180, 0.15), rgba(200, 184, 219, 0.15));
+            padding: 32px;
+            border-radius: 16px;
+            border: 2px solid rgba(200, 184, 219, 0.3);
+            text-align: center;
+        }
+
+        .result-label {
+            font-size: 0.95rem;
+            color: var(--lavender);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .result-value {
+            font-family: 'Crimson Pro', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .result-value.poor {
+            color: var(--coral);
+        }
+
+        .result-value.average {
+            color: var(--golden);
+        }
+
+        .result-value.good {
+            color: var(--sage);
+        }
+
+        .confidence-bar {
+            margin-top: 24px;
+        }
+
+        .confidence-label {
+            font-size: 0.85rem;
+            color: var(--lavender);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .confidence-track {
+            height: 12px;
+            background: rgba(200, 184, 219, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--coral), var(--golden), var(--sage));
+            border-radius: 10px;
+            transition: width 0.8s ease;
+        }
+
+        .info-section {
+            margin-top: 32px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .info-item {
+            background: rgba(10, 14, 39, 0.4);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(200, 184, 219, 0.2);
+        }
+
+        .info-item-label {
+            font-size: 0.85rem;
+            color: var(--lavender);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-item-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--soft-pink);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 30px;
+            color: var(--lavender);
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        .recommendations {
+            margin-top: 24px;
+            padding: 24px;
+            background: rgba(10, 14, 39, 0.4);
+            border-radius: 12px;
+            border-left: 4px solid var(--sage);
+        }
+
+        .recommendations h4 {
+            color: var(--sage);
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+        }
+
+        .recommendations ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .recommendations li {
+            padding: 8px 0;
+            color: var(--warm-cream);
+            opacity: 0.9;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .info-tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 8px;
+            cursor: help;
+        }
+
+        .info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            background: rgba(200, 184, 219, 0.3);
+            border-radius: 50%;
+            font-size: 0.75rem;
+            color: var(--lavender);
+            font-weight: 700;
+        }
+
+        .tooltip-content {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(10, 14, 39, 0.95);
+            color: var(--warm-cream);
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(200, 184, 219, 0.3);
+            width: 280px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            z-index: 1000;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .tooltip-content::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: rgba(10, 14, 39, 0.95);
+        }
+
+        .info-tooltip:hover .tooltip-content {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .help-section {
+            margin-top: 32px;
+            padding: 24px;
+            background: rgba(168, 197, 180, 0.1);
+            border-radius: 12px;
+            border-left: 4px solid var(--sage);
+        }
+
+        .help-section h4 {
+            color: var(--sage);
+            margin-bottom: 16px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .help-item {
+            margin-bottom: 16px;
+            padding: 12px;
+            background: rgba(10, 14, 39, 0.3);
+            border-radius: 8px;
+        }
+
+        .help-item strong {
+            color: var(--lavender);
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .help-item ul {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+
+        .help-item li {
+            margin: 4px 0;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        function SleepHealthDashboard() {
+            const [formData, setFormData] = useState({
+                age: 30,
+                gender: 'Male',
+                dailyStudyHours: 5,
+                screenTimeHours: 3,
+                physicalActivityHours: 2,
+                stressLevel: 'Low',
+                caffeineIntake: 'Low'
+            });
+
+            const [prediction, setPrediction] = useState(null);
+            const [isLoading, setIsLoading] = useState(false);
+
+            const handleInputChange = (field, value) => {
+                setFormData(prev => ({
+                    ...prev,
+                    [field]: value
+                }));
+            };
+
+            const predictSleepQuality = async () => {
+                setIsLoading(true);
+                
+                // Simulate API call delay
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // Calculate detailed risk score
+                const scoreData = calculateRiskScore(formData);
+                const quality = determineQuality(scoreData.total);
+                const confidence = Math.random() * 20 + 75; // 75-95% confidence
+
+                setPrediction({
+                    quality,
+                    confidence: confidence.toFixed(1),
+                    riskScore: scoreData.total.toFixed(1),
+                    factorScores: scoreData.factors,
+                    recommendations: getRecommendations(quality, formData)
+                });
+
+                setIsLoading(false);
+            };
+
+            const calculateRiskScore = (data) => {
+                let score = 50;
+                const factorScores = {};
+
+                // Screen time impact (negative - excessive screen time disrupts sleep)
+                // 0-2 hours: +5, 3-4 hours: 0, 5+ hours: increasingly negative
+                let screenImpact = 0;
+                if (data.screenTimeHours <= 2) screenImpact = 5;
+                else if (data.screenTimeHours <= 4) screenImpact = 0;
+                else screenImpact = -(data.screenTimeHours - 4) * 6;
+                score += screenImpact;
+                factorScores['Screen Time'] = Math.round(screenImpact);
+
+                // Physical activity impact (positive - exercise improves sleep)
+                // 0-1 hours: -10, 2-3 hours: optimal (+15), 4+ hours: good (+10)
+                let activityImpact = 0;
+                if (data.physicalActivityHours < 1) activityImpact = -10;
+                else if (data.physicalActivityHours <= 1) activityImpact = 0;
+                else if (data.physicalActivityHours <= 3) activityImpact = 15;
+                else activityImpact = 10;
+                score += activityImpact;
+                factorScores['Physical Activity'] = activityImpact;
+
+                // Stress level impact (major factor in sleep quality)
+                const stressImpact = { Low: 15, Medium: 0, High: -20 }[data.stressLevel] || 0;
+                score += stressImpact;
+                factorScores['Stress Management'] = stressImpact;
+
+                // Caffeine impact (affects sleep quality)
+                const caffeineImpact = { Low: 10, Medium: 0, High: -15 }[data.caffeineIntake] || 0;
+                score += caffeineImpact;
+                factorScores['Caffeine Intake'] = caffeineImpact;
+
+                // Work-life balance (overwork or too little activity both bad)
+                // Sweet spot is 4-7 hours of productive work/study
+                let balanceImpact = 0;
+                if (data.dailyStudyHours >= 4 && data.dailyStudyHours <= 7) balanceImpact = 10;
+                else if (data.dailyStudyHours < 4) balanceImpact = -5;
+                else balanceImpact = -10; // Overwork
+                score += balanceImpact;
+                factorScores['Work-Life Balance'] = balanceImpact;
+
+                return {
+                    total: Math.max(0, Math.min(100, score)),
+                    factors: factorScores
+                };
+            };
+
+            const determineQuality = (score) => {
+                if (score >= 65) return 'Good';
+                if (score >= 40) return 'Average';
+                return 'Poor';
+            };
+
+            const getRecommendations = (quality, data) => {
+                const recs = [];
+
+                if (data.screenTimeHours > 4) {
+                    recs.push('Reduce screen time, especially 2 hours before bed');
+                }
+
+                if (data.physicalActivityHours < 2) {
+                    recs.push('Increase physical activity to at least 30 minutes daily');
+                }
+
+                if (data.stressLevel === 'High') {
+                    recs.push('Practice stress management techniques like meditation or yoga');
+                }
+
+                if (data.caffeineIntake === 'High') {
+                    recs.push('Limit caffeine intake, especially after 2 PM');
+                }
+
+                if (quality === 'Poor') {
+                    recs.push('Consider consulting a healthcare professional');
+                    recs.push('Maintain a consistent sleep schedule');
+                }
+
+                if (recs.length === 0) {
+                    recs.push('Maintain your healthy sleep habits');
+                    recs.push('Keep a consistent sleep-wake schedule');
+                }
+
+                return recs;
+            };
+
+            return (
+                <div className="app-container">
+                    <header className="header">
+                        <h1>Sleep Health Predictor</h1>
+                        <p>AI-Powered Sleep Quality Assessment for Sri Lankan Adults</p>
+                    </header>
+
+                    <div className="main-content">
+                        <div className="card">
+                            <h2 className="card-title">
+                                <span className="icon">🌙</span>
+                                Patient Information
+                            </h2>
+
+                            <div className="slider-group">
+                                <div className="slider-label">
+                                    <label>Age</label>
+                                    <span className="slider-value">{formData.age} years</span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min="18"
+                                    max="80"
+                                    value={formData.age}
+                                    onChange={(e) => handleInputChange('age', parseInt(e.target.value))}
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>Gender</label>
+                                <select
+                                    value={formData.gender}
+                                    onChange={(e) => handleInputChange('gender', e.target.value)}
+                                >
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+
+                            <div className="slider-group">
+                                <div className="slider-label">
+                                    <label>Daily Study/Work Hours</label>
+                                    <span className="slider-value">{formData.dailyStudyHours} hours</span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max="12"
+                                    value={formData.dailyStudyHours}
+                                    onChange={(e) => handleInputChange('dailyStudyHours', parseInt(e.target.value))}
+                                />
+                            </div>
+
+                            <div className="slider-group">
+                                <div className="slider-label">
+                                    <label>
+                                        Screen Time (Hours/Day)
+                                        <span className="info-tooltip">
+                                            <span className="info-icon">?</span>
+                                            <span className="tooltip-content">
+                                                <strong>How to find your screen time:</strong><br/>
+                                                📱 <strong>Android:</strong> Settings → Digital Wellbeing<br/>
+                                                🍎 <strong>iPhone:</strong> Settings → Screen Time<br/>
+                                                💻 <strong>Windows:</strong> Settings → Family Safety → Screen Time<br/>
+                                                🖥️ <strong>Mac:</strong> System Settings → Screen Time
+                                            </span>
+                                        </span>
+                                    </label>
+                                    <span className="slider-value">{formData.screenTimeHours} hours</span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max="16"
+                                    value={formData.screenTimeHours}
+                                    onChange={(e) => handleInputChange('screenTimeHours', parseInt(e.target.value))}
+                                />
+                            </div>
+
+                            <div className="slider-group">
+                                <div className="slider-label">
+                                    <label>Physical Activity (Hours/Day)</label>
+                                    <span className="slider-value">{formData.physicalActivityHours} hours</span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max="6"
+                                    value={formData.physicalActivityHours}
+                                    onChange={(e) => handleInputChange('physicalActivityHours', parseInt(e.target.value))}
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>Stress Level</label>
+                                <select
+                                    value={formData.stressLevel}
+                                    onChange={(e) => handleInputChange('stressLevel', e.target.value)}
+                                >
+                                    <option value="Low">Low</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="High">High</option>
+                                </select>
+                            </div>
+
+                            <div className="form-group">
+                                <label>Caffeine Intake</label>
+                                <select
+                                    value={formData.caffeineIntake}
+                                    onChange={(e) => handleInputChange('caffeineIntake', e.target.value)}
+                                >
+                                    <option value="Low">Low (0-1 cups/day)</option>
+                                    <option value="Medium">Medium (2-3 cups/day)</option>
+                                    <option value="High">High (4+ cups/day)</option>
+                                </select>
+                            </div>
+
+                            <button
+                                className="predict-btn"
+                                onClick={predictSleepQuality}
+                                disabled={isLoading}
+                            >
+                                {isLoading ? <span className="loading"></span> : 'Predict Sleep Quality'}
+                            </button>
+
+                            <div className="help-section">
+                                <h4>📋 Need Help Finding Your Data?</h4>
+                                
+                                <div className="help-item">
+                                    <strong>📱 Screen Time</strong>
+                                    Check your device's built-in tracking:
+                                    <ul>
+                                        <li><strong>Android:</strong> Settings → Digital Wellbeing & Parental Controls</li>
+                                        <li><strong>iPhone:</strong> Settings → Screen Time → See All Activity</li>
+                                        <li><strong>Windows 10/11:</strong> Settings → System → Focus → Focus Assist</li>
+                                        <li><strong>macOS:</strong> System Settings → Screen Time</li>
+                                    </ul>
+                                    Include phone, computer, tablet, and TV time.
+                                </div>
+
+                                <div className="help-item">
+                                    <strong>🏃 Physical Activity</strong>
+                                    Count any exercise or movement:
+                                    <ul>
+                                        <li>Walking, jogging, running</li>
+                                        <li>Gym workouts, sports</li>
+                                        <li>Yoga, dancing, cycling</li>
+                                        <li>Check fitness apps: Google Fit, Apple Health, Fitbit</li>
+                                    </ul>
+                                </div>
+
+                                <div className="help-item">
+                                    <strong>☕ Caffeine Intake</strong>
+                                    Count all caffeine sources:
+                                    <ul>
+                                        <li>Coffee, tea, energy drinks</li>
+                                        <li>Soft drinks (Coke, Pepsi)</li>
+                                        <li>Chocolate products</li>
+                                        <li>1 cup ≈ 250ml serving</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="card">
+                            <h2 className="card-title">
+                                <span className="icon">📊</span>
+                                Prediction Results
+                            </h2>
+
+                            {!prediction ? (
+                                <div style={{ textAlign: 'center', padding: '60px 20px', opacity: 0.6 }}>
+                                    <div style={{ fontSize: '4rem', marginBottom: '16px' }}>💤</div>
+                                    <p style={{ fontSize: '1.1rem' }}>Enter your information and click "Predict Sleep Quality" to see results</p>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="result-card">
+                                        <div className="result-label">Predicted Sleep Quality</div>
+                                        <div className={`result-value ${prediction.quality.toLowerCase()}`}>
+                                            {prediction.quality}
+                                        </div>
+
+                                        <div className="confidence-bar">
+                                            <div className="confidence-label">
+                                                <span>Model Confidence</span>
+                                                <span style={{ fontWeight: 700 }}>{prediction.confidence}%</span>
+                                            </div>
+                                            <div className="confidence-track">
+                                                <div
+                                                    className="confidence-fill"
+                                                    style={{ width: `${prediction.confidence}%` }}
+                                                ></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="info-section">
+                                        <h3 style={{ 
+                                            fontSize: '1.3rem', 
+                                            color: 'var(--lavender)', 
+                                            marginBottom: '20px',
+                                            fontFamily: 'Crimson Pro, serif'
+                                        }}>
+                                            Sleep Health Score Breakdown
+                                        </h3>
+                                        
+                                        <div style={{
+                                            background: 'rgba(10, 14, 39, 0.4)',
+                                            padding: '32px',
+                                            borderRadius: '16px',
+                                            border: '2px solid rgba(200, 184, 219, 0.3)',
+                                            marginBottom: '24px'
+                                        }}>
+                                            <div style={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'center',
+                                                marginBottom: '16px'
+                                            }}>
+                                                <span style={{ fontSize: '1.1rem', color: 'var(--lavender)' }}>
+                                                    Overall Health Score
+                                                </span>
+                                                <span style={{ 
+                                                    fontSize: '2.5rem', 
+                                                    fontWeight: '800',
+                                                    background: 'linear-gradient(135deg, var(--soft-pink), var(--lavender))',
+                                                    WebkitBackgroundClip: 'text',
+                                                    WebkitTextFillColor: 'transparent'
+                                                }}>
+                                                    {prediction.riskScore}/100
+                                                </span>
+                                            </div>
+                                            
+                                            <div className="confidence-track" style={{ height: '20px', marginBottom: '8px' }}>
+                                                <div
+                                                    className="confidence-fill"
+                                                    style={{ 
+                                                        width: `${prediction.riskScore}%`,
+                                                        background: prediction.riskScore >= 65 ? 
+                                                            'linear-gradient(90deg, var(--sage), #80d4a0)' :
+                                                            prediction.riskScore >= 40 ?
+                                                            'linear-gradient(90deg, var(--golden), #f4c261)' :
+                                                            'linear-gradient(90deg, var(--coral), #ff8b8b)'
+                                                    }}
+                                                ></div>
+                                            </div>
+                                            
+                                            <div style={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                fontSize: '0.75rem',
+                                                color: 'var(--lavender)',
+                                                opacity: 0.7
+                                            }}>
+                                                <span>Poor (0-39)</span>
+                                                <span>Average (40-64)</span>
+                                                <span>Good (65-100)</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="info-grid">
+                                            {prediction.factorScores && Object.entries(prediction.factorScores).map(([factor, score]) => (
+                                                <div className="info-item" key={factor}>
+                                                    <div className="info-item-label">{factor}</div>
+                                                    <div style={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '12px'
+                                                    }}>
+                                                        <div className="info-item-value" style={{ fontSize: '1.3rem' }}>
+                                                            {score > 0 ? '+' : ''}{score}
+                                                        </div>
+                                                        <div style={{
+                                                            fontSize: '1.5rem'
+                                                        }}>
+                                                            {score >= 8 ? '✅' : score <= -8 ? '⚠️' : score > 0 ? '👍' : score < 0 ? '👎' : '➖'}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {prediction.recommendations && prediction.recommendations.length > 0 && (
+                                        <div className="recommendations">
+                                            <h4>💡 Personalized Recommendations</h4>
+                                            <ul>
+                                                {prediction.recommendations.map((rec, idx) => (
+                                                    <li key={idx}>{rec}</li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+                                </>
+                            )}
+                        </div>
+                    </div>
+
+                    <footer className="footer">
+                        <p>Sleep Health Prediction System | Machine Learning Project</p>
+                        <p>Data-driven insights for better sleep health among Sri Lankan adults</p>
+                    </footer>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<SleepHealthDashboard />, document.getElementById('root'));
+    </script>
+</body>
+</html>
